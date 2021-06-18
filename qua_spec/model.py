@@ -10,10 +10,28 @@ class PrimitiveData(Enum):
     string = 2
 
 
+class BaseType:
+    @property
+    def is_data(self):
+        return False
+
+    @property
+    def is_union(self):
+        return False
+
+    @property
+    def is_enum(self):
+        return False
+
+
 @dataclass
-class EnumType:
+class EnumType(BaseType):
     name: str
     values: List[str]
+
+    @property
+    def is_enum(self):
+        return True
 
 
 @dataclass
@@ -29,15 +47,23 @@ class TypeProperty:
 
 
 @dataclass
-class DataType:
+class DataType(BaseType):
     name: str
     properties: Dict[str, TypeProperty]
 
+    @property
+    def is_data(self):
+        return True
+
 
 @dataclass
-class UnionType:
+class UnionType(BaseType):
     name: str
     types: List[str]
+
+    @property
+    def is_union(self):
+        return True
 
 
 @dataclass
