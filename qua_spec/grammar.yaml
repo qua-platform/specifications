@@ -1,0 +1,249 @@
+#
+# A type can be one of:
+#
+$schema: https://qualang.io/2021.1/ast.schema.json#
+version: 1.0.0
+
+types:
+
+  Program:
+    data:
+      script: Script
+
+  Script:
+    data:
+      body: BlockStatement
+
+  BlockStatement:
+    data:
+      statements: [ AnyStatement ]
+
+  AnyStatement:
+    union:
+      - PlayStatement
+      - MeasureStatement
+      - WaitStatement
+      - SyncStatement
+      - IfStatement
+      - AssignmentStatement
+      - ForStatement
+      - RusStatement
+      - AlignStatement
+      - UpdateFrequencyStatement
+      - ZRotationStatement
+      - PauseStatement
+      - SaveStatement
+      - ForEachStatement
+      - WaitForTriggerStatement
+      - StrictTimingStatement
+      - UpdateCorrectionStatement
+      - ResetPhaseStatement
+      - RampToZeroStatement
+      - ResetFrameStatement
+
+
+
+  MeasureStatement:
+    data: { }
+
+  WaitStatement:
+    data: { }
+
+  SyncStatement:
+    data: { }
+
+  IfStatement:
+    data: { }
+
+  AssignmentStatement:
+    data: { }
+
+  ForStatement:
+    data: { }
+
+  RusStatement:
+    data: { }
+
+  AlignStatement:
+    data:
+      qe: [QuantumElementReference]
+
+  UpdateFrequencyUnits:
+    enum: # todo: use full name of unit
+      - Hz
+      - mHz
+      - uHz
+      - nHz
+      - pHz
+
+  UpdateFrequencyStatement:
+    data:
+      qe: QuantumElementReference
+      value: AnyExpression
+      units: UpdateFrequencyUnits
+      keepPhase: boolean
+
+  ZRotationStatement:
+    data:
+      qe: QuantumElementReference
+      value: AnyExpression
+
+  PauseStatement:
+    data: { }
+
+  SaveStatement:
+    data: { }
+
+  ForEachStatement:
+    data: { }
+
+  WaitForTriggerStatement:
+    data: { }
+
+  StrictTimingStatement:
+    data: { }
+
+  UpdateCorrectionStatement:
+    data: { }
+
+  ResetPhaseStatement:
+    data: { }
+
+  RampToZeroStatement:
+    data:
+      qe: QuantumElementReference
+      duration: number
+
+  ResetFrameStatement:
+    data:
+      qe: QuantumElementReference
+
+
+
+  #### PULSE
+
+  PlayStatement:
+    data:
+      qe: QuantumElementRef
+      pulse: AnyPulseType
+      ampliutude: AmpMultiplier
+      duration: AnyExpression
+      condition: AnyExpression
+      targetInput: AnyExpression
+      chirp: Chirp
+      truncate: AnyExpression
+
+  AmpMultiplier:
+    data:
+      v0: AnyExpression
+      v1: AnyExpression
+      v2: AnyExpression
+      v3: AnyExpression
+
+  RampPulse:
+    data:
+      value: AnyExpression
+
+  ChirpUnit:
+    enum:
+      - HzPerNanoSec
+      - mHzPerNanoSec
+      - uHzPerNanoSec
+      - nHzPerNanoSec
+      - pHzPerNanoSec
+
+  Chirp:
+    data:
+      rate: AnyExpression
+      unit: ChirpUnit
+      times: [number]
+
+
+  AnyPulseType:
+    union:
+      - PulseReference
+      - RampPulse
+
+  ### Measurement
+
+  AnyAnalogMeasureProcess:
+    union:
+      - x
+
+  BareIntegration:
+    data:
+      integration: IntegrationWeightReference
+      target: AnyMemoryExpression
+
+  ########################## EXPRESSIONS
+
+  AnyExpression:
+    union:
+      - VarRefExpression
+      - IORefExpression
+      - LiteralExpression
+      - BinaryExpression
+      - ArrayCellRefExpression
+      - ArrayLengthExpression
+      - LibFunctionExpression
+
+  AnyMemoryExpression:
+    union:
+      - VarRefExpression
+      - ArrayCellRefExpression
+
+
+  VarRefExpression:
+    data:
+      variable: string
+
+  IORefExpression:
+    data:
+      io: string
+
+  LiteralExpression:
+    union:
+      - IntAtom
+      - BoolAtom
+      - RealAtom
+
+  BinaryExpression:
+    data:
+      op: BinaryOperator
+      left: AnyExpression
+      right: AnyExpression
+
+  BinaryOperator:
+    enum:
+      - ADD
+      - SUB
+      - MULT
+      - DIV
+      # binary operators
+      - AND
+      - OR
+      - XOR
+      # comparisons
+      - LT
+      - LET
+      - GT
+      - GET
+      - EQ
+      # shifts
+      - SHL
+      - SHR
+
+  ######################### REFERENCES
+
+  QuantumElementReference:
+    data:
+      el: string
+
+  PulseReference:
+    data:
+      pulse: string
+
+  IntegrationWeightReference:
+    data:
+      integrationWeight: string
+
