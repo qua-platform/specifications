@@ -1,0 +1,234 @@
+#
+# A type can be one of:
+#
+$schema: https://qualang.io/2021.1/ast_ext.schema.json#
+
+enums:
+  PulseToDigitalBindingType:
+    - Recording
+    - Gating
+
+  ThresholdingPolarity:
+    - Ascending
+    - Descending
+
+unions:
+  OptionalOutputPulseParameters:
+    - OutputPulseParameters
+    - None
+
+  AnyElementInput:
+    - NoElementInput
+    - MixElementInput
+    - SingleElementInput
+    - SingleElementInputCollection
+
+  AnyArbitraryWaveformCompression:
+    - NoCompression
+    - BySampleRateCompression
+    - AutomaticWaveformCompression
+
+  AnyAnalogWaveform:
+    - ArbitraryWaveform
+    - ConstantWaveform
+
+  AnyPulseConfigWaveformReference:
+    - PulseConfigIQWaveformReference
+    - PulseConfigSingleWaveformReference
+
+  AnyElementThread:
+    - NamedElementThread
+    - DefaultElementThread
+
+  AnyHoldOffset:
+    - DisabledHoldOffset
+    - EnabledHoldOffset
+
+  AnyElementConfig:
+    - ControlElementConfig
+    - MeasurementElementConfig
+
+  OptionalIntermediateFrequency:
+    - IntermediateFrequencyValue
+    - None
+
+types:
+  OpxDigitalOutputPortReference:
+    opx: string
+    port: number
+
+  OpxAnalogOutputPortReference:
+    opx: string
+    port: number
+
+  OpxAnalogInputPortReference:
+    opx: string
+    port: number
+
+  Config:
+    analog_outputs: [ AnalogOutputPortConfig ]
+    analog_inputs: [ AnalogInputPortConfig ]
+    digital_outputs: [ DigitalOutputPortConfig ]
+    elements: [ ElementConfig ]
+    pulses: [ PulseConfig ]
+    pulse_digital_bindings: [ PulseToDigitalBinding ]
+    analog_waveforms: [ AnyAnalogWaveform ]
+    digital_waveforms: [ DigitalWaveform ]
+    mixers: [ Mixer ]
+    integration_weights: [ IntegrationWeight ]
+
+  AnalogOutputFilterConfig:
+    feed_forward: [ number ]
+    feed_back: [ number ]
+
+  AnalogOutputPortConfig:
+    controller: string
+    port: number
+    filter: AnalogOutputFilterConfig
+    offset: number
+
+  AnalogInputPortConfig:
+    controller: string
+    port: number
+    # HW SPECIFIC?
+    offset: number
+    # HW SPECIFIC?
+    gain_db: number
+
+  DigitalOutputPortConfig:
+    controller: string
+    port: number
+
+  ConstantWaveform:
+    name: string
+    sample: number
+    multiplier: number
+
+  ArbitraryWaveform:
+    name: string
+    samples: [ number ]
+    multiplier: number
+    compression: AnyArbitraryWaveformCompression
+
+  AutomaticWaveformCompression:
+    max_allowed_error: number
+
+  BySampleRateCompression:
+    sample_rate: number
+
+  NoCompression: {}
+
+  DigitalWaveformSample:
+    value: boolean
+    length: number
+
+  DigitalWaveform:
+    name: string
+    samples: [DigitalWaveformSample]
+
+  LiteralMatrix:
+    v00: number
+    v01: number
+    v10: number
+    v11: number
+
+  FrequencyCorrection:
+    frequency: number
+    lo_frequency: number
+    correction: LiteralMatrix
+
+  Mixer:
+    name: string
+    corrections: [FrequencyCorrection]
+
+  IntegrationWeight:
+    name: string
+    cosine: [number]
+    sine: [number]
+
+  PulseConfigIQWaveformReference:
+    i: string
+    q: string
+
+  PulseConfigSingleWaveformReference:
+    single: string
+
+  PulseConfig:
+    name: string
+    length: number
+    waveform: AnyPulseConfigWaveformReference
+    measurement: boolean
+
+  PulseToDigitalBinding:
+    pulse_name: string
+    digital_pulse_name: string
+    binding_type: PulseToDigitalBindingType
+
+  NoElementInput: {}
+  MixElementInput:
+    i: OpxAnalogOutputPortReference
+    q: OpxAnalogOutputPortReference
+    mixer: string
+    lo_frequency: number
+
+  SingleElementInput:
+    single: OpxAnalogOutputPortReference
+
+  SingleInputCollectionItem:
+    name: string
+    input: SingleElementInput
+
+  SingleElementInputCollection:
+    inputs: [SingleInputCollectionItem]
+
+  ElementNamedAnalogOutput:
+    name: string
+    output: OpxAnalogInputPortReference
+
+  ElementNamedDigitalInput:
+    name: string
+    input: OpxDigitalOutputPortReference
+    delay: number
+    expand: number
+
+  ControlElementConfig: {}
+
+  MeasurementElementConfig:
+    smearing: number
+    time_of_flight: number
+
+  DefaultElementThread: {}
+  NamedElementThread:
+    name: string
+
+  DisabledHoldOffset: {}
+  EnabledHoldOffset:
+    duration: number
+
+  IntermediateFrequencyValue:
+    value: number
+
+  ThresholdAndPolarity:
+    threshold: number
+    polarity: ThresholdingPolarity
+
+  OutputPulseParameters:
+    signal: ThresholdAndPolarity
+    derivative: ThresholdAndPolarity
+
+  ElementConfig:
+    name: string
+    intermediate_frequency: OptionalIntermediateFrequency
+    analog_inputs: AnyElementInput
+    analog_outputs: [ElementNamedAnalogOutput]
+    digital_inputs: [ElementNamedDigitalInput]
+    config: AnyElementConfig
+    thread: AnyElementThread
+    hold_offset: AnyHoldOffset
+    output_pulse_parameters: OptionalOutputPulseParameters
+
+#  MeasurementElementBinding:
+#    element: string
+#    measurement_element: string
+
+  None: {}

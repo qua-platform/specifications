@@ -1,6 +1,7 @@
-from typing import List, Any, Optional
+from typing import List, Any, Optional, Dict, Callable
 from jinja2 import Environment, select_autoescape, FileSystemLoader
 from dataclasses import dataclass
+import shutil
 import os
 
 
@@ -12,6 +13,21 @@ class RenderingEnv:
     variable_end_string: Optional[str] = None
     comment_start_string: Optional[str] = None
     comment_end_string: Optional[str] = None
+    filters: Optional[Dict[str, Callable]] = None
+
+    def to_jinja_env_args(self):
+        d = {
+            "block_start_string": self.block_start_string,
+            "block_end_string": self.block_end_string,
+            "variable_start_string": self.variable_start_string,
+            "variable_end_string": self.variable_end_string,
+            "comment_start_string": self.comment_start_string,
+            "comment_end_string": self.comment_end_string,
+        }
+        return {
+            name: value
+            for name, value in d.items() if value is not None
+        }
 
 
 @dataclass
@@ -29,16 +45,27 @@ class RenderConfig:
     env: Optional[RenderingEnv] = None
 
 
+_default_env = Environment()
+
+
 def render(config: RenderConfig):
+    extra_env = config.env.to_jinja_env_args() if config.env is not None else {}
     env = Environment(
         loader=FileSystemLoader(config.templates),
-        autoescape=select_autoescape()
+        autoescape=select_autoescape(),
+        **extra_env
     )
-    if not os.path.exists(config.output):
-        os.mkdir(config.output)
+    # add filters
+    if config.env is not None and config.env.filters is not None:
+        for name, filter in config.env.filters.items():
+            env.filters[name] = filter
+
+    shutil.rmtree(config.output, ignore_errors=True)
+    os.makedirs(config.output, exist_ok=True)
     for job in config.jobs:
         tpl = env.get_template(job.template)
         output = tpl.render(**job.data)
         output_file = os.path.join(config.output, job.output)
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
         with open(output_file, "w+") as f:
             f.write(output)
