@@ -12,20 +12,10 @@ enums:
     - Int
     - Fixed
     - Boolean
-
-  UpdateFrequencyUnits:
-    - Hz
-    - mHz
-    - uHz
-    - nHz
-    - pHz
-
-  ChirpUnit:
-    - HzPerNanoSec
-    - mHzPerNanoSec
-    - uHzPerNanoSec
-    - nHzPerNanoSec
-    - pHzPerNanoSec
+    
+  UnaryOperator:
+    - NEG
+    - NOT
 
   BinaryOperator:
     - ADD
@@ -46,61 +36,61 @@ enums:
     - SHL
     - SHR
 
+  ChirpUnit:
+    - HzPerNanoSec
+    - mHzPerNanoSec
+    - uHzPerNanoSec
+    - nHzPerNanoSec
+    - pHzPerNanoSec
+
 unions:
   AnyStatement:
-    - PlayStatement
-    - MeasureStatement
-    - WaitStatement
-    - IfStatement
     - AssignmentStatement
-    - ForStatement
-    - RusStatement
-    - AlignStatement
-    - UpdateFrequencyStatement
-    - ZRotationStatement
-    - PauseStatement
     - SaveStatement
-    - ForEachStatement
+    - ForStatement
+    - WhileStatement
+    - IfStatement
+    - BreakStatement
+    - ContinueStatement
+    - SwitchStatement
+    - SequenceStatement
+    - PlayStatement
+    - WaitStatement
+    - ParallelStatement
+    - AlignStatement
     - WaitForTriggerStatement
-    - StrictTimingBlockStatement
-    - UpdateCorrectionStatement
-    - ResetPhaseStatement
-    - RampToZeroStatement
-    - ResetFrameStatement
 
   LiteralExpression:
     - LiteralFixedExpression
     - LiteralIntegerExpression
     - LiteralBooleanExpression
 
-  AnyPulseType:
-    - PulseReference
-    - RampPulse
-
-  AnyMeasureProcess:
-    - AnyAnalogMeasureProcess
-
-  AnyAnalogMeasureProcess:
-    - BareIntegration
-    - DemodIntegration
-    - DualBareIntegration
-    - DualDemodIntegration
-    - RawTimeTagging
-
   AnyExpression:
     - VarRefExpression
+    - ArrayCellExpression
     - IORefExpression
     - LiteralExpression
     - BinaryExpression
-
-  AnySaveableExpression:
+    - UnaryExpression
+    - LibFunctionExpression
+    
+  AnyTargetExpression:
     - VarRefExpression
+    - ArrayCellExpression
     - IORefExpression
-    - LiteralExpression
-
-  AnyMemoryExpression:
+    
+  AnyIterableExpression:
     - VarRefExpression
+    - RangeExpression
 
+  PlayPart:
+    - AnalogPlayPart
+    - DigitalPlayPart
+
+  AnyAnalogPulse:
+    - AnalogPulseReference
+    - RampPulse
+    
 types:
 
   Program:
@@ -117,7 +107,7 @@ types:
   VariableDeclaration:
     name: string
     type: QuaPrimitiveType
-    size: number
+    size: [ number ]
     values: [ LiteralExpression ]
     $validations:
       non_empty_name:
@@ -125,11 +115,9 @@ types:
         description: |
           `name` must be non empty string
       size_gte_1:
-        rule: node.size > `1`
         description: |
           `size` must be 1 or greater
       size_is_whole:
-        rule: ceil(node.size) == node.size
         description: |
           `size` is a whole number without fraction part
       all_values_same_type:
@@ -142,14 +130,36 @@ types:
           `values` length is the same size as `size`
 
 
+  ########################## STATEMENTS
 
-
-  MeasureStatement: { }
-
-  WaitStatement:
-    qe: [ QuantumElementReference ]
-    time: AnyExpression
-
+  AssignmentStatement:
+    lhs: AnyTargetExpression
+    rhs: AnyExpression
+    
+  SaveStatement:
+    source: AnyExpression
+    target: SaveTargetReference
+  
+  VarIterablePair:
+    variable: VarRefExpression
+    values: VarRefExpression
+    $validations:
+      variable_scalar: "`variable` must be a scalar variable"
+      values_array: "`values` must be an array of values"
+      match_types: "`variable` type must match the items type of `values`"
+  
+  ForStatement:
+    pairs: [VarIterablePair]
+    body: [AnyStatement]
+    $validations:
+      size_of_iterator_is_one: "size of `iterator` is one"
+      
+  WhileStatement:
+    condition: AnyExpression
+    body: [AnyStatement]
+    $validations:
+      condition_is_boolean: "`condition` expression is boolean"
+    
   IfStatement:
     condition: AnyExpression
     body: [AnyStatement]
@@ -164,157 +174,96 @@ types:
     $validations:
       condition_is_boolean: "`condition` expression is boolean"
 
-  AssignmentStatement:
-    lhs: AnyMemoryExpression
-    rhs: AnyExpression
+  BreakStatement: 
+    $validations:
+      break_inside_loop: "`break` statement is inside a loop"
+      
+  ContinueStatement: 
+    $validations:
+      break_inside_loop: "`continue` statement is inside a loop"
 
-
-  ForStatement:
-    init: [AssignmentStatement]
-    condition: AnyExpression
-    update: [AssignmentStatement]
+  SwitchStatement:
+    expression: AnyExpression
+    cases: [CasePart]
+    default: [AnyStatement]
+  
+  CasePart:
+    case: AnyExpression
     body: [AnyStatement]
     $validations:
-      condition_is_boolean: "`condition` expression is boolean"
-
-  RusStatement:
-    body: [ AnyStatement ]
-    until: AnyExpression
-    fail: [ AnyStatement ]
-    $validations:
-      until_is_boolean: "`until` expression is boolean"
-
-  AlignStatement:
-    qe: [ QuantumElementReference ]
-
-  UpdateFrequencyStatement:
-    qe: QuantumElementReference
-    value: AnyExpression
-    units: UpdateFrequencyUnits
-    keep_phase: boolean
-
-  ZRotationStatement:
-    qe: QuantumElementReference
-    value: AnyExpression
-
-  PauseStatement:
-    qe: [QuantumElementReference]
-
-  SaveStatement:
-    source: AnySaveableExpression
-    target: SaveTargetReference
-
-  VarIterablePair:
-    variable: VarRefExpression
-    values: VarRefExpression
-
-    $validations:
-      variable_scalar: "`variable` must be a scalar variable"
-      values_array: "`values` must be an array of values"
-      match_types: "`variable` type must match the items type of `values`"
-
-  ForEachStatement:
-    pairs: [VarIterablePair]
+      case_type_match_switch_expression_type: "case type match switch expression type"
+      
+  SequenceStatement:
     body: [AnyStatement]
-    $validations:
-      # TODO: do we need this requirement?
-      has_pairs: "`pairs` must be non-empty"
-
-  WaitForTriggerStatement:
-    qe: QuantumElementReference
-    pulse_to_play: PulseReference
-
-  StrictTimingBlockStatement:
-    qe: QuantumElementReference
-    body: [AnyStatement]
-
-  UpdateCorrectionStatement:
-    qe: QuantumElementReference
-    correction: Correction
-
-  Matrix:
+    
+  AmpMultiplier:
     v00: AnyExpression
     v01: AnyExpression
     v10: AnyExpression
     v11: AnyExpression
-
-  Correction:
-    matrix: Matrix
-
-  ResetPhaseStatement:
-    qe: QuantumElementReference
-
-  RampToZeroStatement:
-    qe: QuantumElementReference
-    duration: number
-
-  ResetFrameStatement:
-    qe: QuantumElementReference
-
-
-
-  #### PULSE
-
-  PlayStatement:
-    qe: QuantumElementReference
-    pulse: AnyPulseType
-    ampliutude: AmpMultiplier
-    duration: AnyExpression
-    condition: AnyExpression
-    targetInput: string
-    chirp: Chirp
-    truncate: AnyExpression
-
-  AmpMultiplier:
-    v0: AnyExpression
-    v1: AnyExpression
-    v2: AnyExpression
-    v3: AnyExpression
+    
+  Chirp:
+    rate: ChirpRates
+    unit: ChirpUnit
+    
+  ChirpRates:
+    rate: AnyExpression
+    time: number
 
   RampPulse:
-    value: AnyExpression
+    slope: AnyExpression
+    base: AnyExpression
 
-  Chirp:
-    rate: AnyExpression
-    unit: ChirpUnit
-    times: [ number ]
+  AnalogPlayPart:
+    pulse: AnyAnalogPulse
+    output: AnalogOutputReference
+    oscilator: OscilatorReference
+    chirp: Chirp
+    ampliutude: AmpMultiplier
 
-  ### Measurement
+  DigitalPlayPart:
+    waveform: DigitalWaveformReference
+    output: DigitalOutputReference
+    route: DigitalRouteReference
+  
+  PlayStatement:
+    plays: [PlayPart]
+    duration: AnyExpression
+    condition: AnyExpression
+    truncate: AnyExpression
+  
+  WaitStatement:
+    time: AnyExpression
 
-  BareIntegration:
-    integration: IntegrationWeightReference
-    target: AnyMemoryExpression
+  ParallelStatement:
+    threads: [ThreadPart]
+    
+  ThreadPart:
+    name: string
+    body: [AnyStatement]
+    
+  AlignStatement:
+    threads: [ ThreadReference ]
 
-  DualBareIntegration:
-    integration1: IntegrationWeightReference
-    integration2: IntegrationWeightReference
-    target: AnyMemoryExpression
-    elementOutput1: string
-    elementOutput2: string
+  PauseStatement: {}
 
-  DemodIntegration:
-    integration: IntegrationWeightReference
-    target: AnyMemoryExpression
-    elementOutput: string
+  WaitForTriggerStatement:
+    input: DigitalInputReference
+    plays: [PlayPart]
 
-  DualDemodIntegration:
-    integration1: IntegrationWeightReference
-    integration2: IntegrationWeightReference
-    target: AnyMemoryExpression
-    elementOutput1: string
-    elementOutput2: string
 
-  RawTimeTagging:
-    target: AnyMemoryExpression
-    targetLen: VarRefExpression # TODO: should be expression?
-    maxTime: number
-    elementOutput: string
 
   ########################## EXPRESSIONS
 
 
   VarRefExpression:
     variable: string
+    
+  ArrayCellExpression:
+    array: VarRefExpression
+    index: AnyExpression
+    $validations:
+      integer: "`index` must be an integer expression"
 
   IORefExpression:
     io: number
@@ -327,34 +276,56 @@ types:
 
   LiteralIntegerExpression:
     value: number
-    $validation:
-      range: [-100, 100]
-      precision: 0
 
   LiteralBooleanExpression:
     value: boolean
-    $validation:
-      range: [-100, 100]
 
   BinaryExpression:
     op: BinaryOperator
     left: AnyExpression
     right: AnyExpression
+    
+  UnaryExpression:
+    op: UnaryOperator
+    operand: AnyExpression
+    
+  LibFunctionExpression:
+    library_name: string
+    function_name: string
+    positioned_arguments: [AnyExpression]
+
+  RangeExpression:
+    from: AnyExpression
+    to: AnyExpression
+    step: AnyExpression
+
 
   ######################### REFERENCES
 
-  QuantumElementReference:
-    el: string
-
-  PulseReference:
-    pulse: string
-    $validations:
-      pulse_not_defined:
-        rule: contains(root.config.pulses[].name, node.pulse)
-        description: The `pulse` was not defined in config
-
-  IntegrationWeightReference:
-    integrationWeight: string
 
   SaveTargetReference:
     tag: string
+    
+  AnalogPulseReference:
+    name: string
+    
+  AnalogOutputReference:
+    name: string
+
+  DigitalWaveformReference:
+    name: string
+
+  DigitalOutputReference:
+    name: string
+
+  DigitalInputReference:
+    name: string
+
+  DigitalRouteReference:
+    name: string
+    
+  OscilatorReference:
+    name: string
+    
+  ThreadReference:
+    name: string
