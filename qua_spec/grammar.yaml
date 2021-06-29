@@ -90,7 +90,27 @@ unions:
   AnyAnalogPulse:
     - AnalogPulseReference
     - RampPulse
-    
+
+  OptionalChirp:
+    - Chirp
+    - NoChirp
+
+  OptionalAmpMultiplier:
+    - AmpMultiplier
+    - NoAmpMultiplier
+
+  OptionalDuration:
+    - Duration
+    - NoDuration
+
+  OptionalCondition:
+    - Condition
+    - NoCondition
+
+  OptionalTruncate:
+    - Truncate
+    - NoTruncate
+
 types:
 
   Program:
@@ -195,13 +215,17 @@ types:
       
   SequenceStatement:
     body: [AnyStatement]
-    
+
+  NoAmpMultiplier: {}
+
   AmpMultiplier:
     v00: AnyExpression
     v01: AnyExpression
     v10: AnyExpression
     v11: AnyExpression
-    
+
+  NoChirp: {}
+
   Chirp:
     rate: ChirpRates
     unit: ChirpUnit
@@ -218,19 +242,34 @@ types:
     pulse: AnyAnalogPulse
     output: AnalogOutputReference
     oscilator: OscilatorReference
-    chirp: Chirp
-    ampliutude: AmpMultiplier
+    chirp: OptionalChirp
+    ampliutude: OptionalAmpMultiplier
 
   DigitalPlayPart:
     waveform: DigitalWaveformReference
     output: DigitalOutputReference
     route: DigitalRouteReference
+
+  NoDuration: {}
+
+  Duration:
+    value: AnyExpression
+
+  NoCondition: {}
+
+  Condition:
+    value: AnyExpression
+
+  NoTruncate: {}
+
+  Truncate:
+    value: AnyExpression
   
   PlayStatement:
     plays: [PlayPart]
-    duration: AnyExpression
-    condition: AnyExpression
-    truncate: AnyExpression
+    duration: OptionalDuration
+    condition: OptionalCondition
+    truncate: OptionalTruncate
   
   WaitStatement:
     time: AnyExpression
