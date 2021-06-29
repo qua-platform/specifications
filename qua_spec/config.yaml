@@ -27,9 +27,9 @@ types:
     digital_inputs: [ DigitalInputConfig ]
     oscillators: [ OscillatorConfig ]
     analog_waveforms: [ AnalogWaveformConfig ]
-    analog_pulse: [ AnalogPulseConfig ]
+    analog_pulses: [ AnalogPulseConfig ]
     digital_waveforms: [ DigitalWaveformConfig ]
-    digital_route: [ DigitalRouteConfig ]
+    digital_routes: [ DigitalRouteConfig ]
 
   AnalogOutputFilterConfig:
     feed_forward: [ number ]

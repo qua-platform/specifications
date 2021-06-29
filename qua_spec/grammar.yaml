@@ -162,7 +162,7 @@ types:
   
   VarIterablePair:
     variable: VarRefExpression
-    values: VarRefExpression
+    values: AnyIterableExpression
     $validations:
       variable_scalar: "`variable` must be a scalar variable"
       values_array: "`values` must be an array of values"
