@@ -104,6 +104,7 @@ types:
     name: string
     delay: number
     buffer: number
+    outputs: [string]
 
   CorrectionMatrixConfig:
     v00: number

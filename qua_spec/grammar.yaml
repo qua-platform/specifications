@@ -111,6 +111,10 @@ unions:
     - Truncate
     - NoTruncate
 
+  OptionalOscillator:
+    - OscillatorReference
+    - NoOscillator
+
 types:
 
   Program:
@@ -238,16 +242,17 @@ types:
     slope: AnyExpression
     base: AnyExpression
 
+  NoOscillator: {}
+
   AnalogPlayPart:
     pulse: AnyAnalogPulse
     output: AnalogOutputReference
-    oscilator: OscilatorReference
+    oscillator: OptionalOscillator
     chirp: OptionalChirp
     ampliutude: OptionalAmpMultiplier
 
   DigitalPlayPart:
     waveform: DigitalWaveformReference
-    output: DigitalOutputReference
     route: DigitalRouteReference
 
   NoDuration: {}
@@ -363,7 +368,7 @@ types:
   DigitalRouteReference:
     name: string
     
-  OscilatorReference:
+  OscillatorReference:
     name: string
     
   ThreadReference:
