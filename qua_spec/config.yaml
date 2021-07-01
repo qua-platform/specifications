@@ -97,11 +97,14 @@ types:
     name: string
     samples: [ DigitalWaveformSample ]
 
+  DigitalOutputReference:
+    name: string
+
   DigitalRouteConfig:
     name: string
     delay: number
     buffer: number
-    outputs: [string]
+    outputs: [DigitalOutputReference]
 
   CorrectionMatrixConfig:
     v00: number
