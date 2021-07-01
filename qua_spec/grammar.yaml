@@ -114,32 +114,44 @@ types:
   BlockStatement:
     statements: [ AnyStatement ]
 
-  VariableDeclaration:
+  IntegerVariableDeclaration:
     name: string
-    type: QuaPrimitiveType
     size: number
-    values: [ LiteralExpression ]
+    values: [ LiteralIntegerExpression ]
     $validations:
-      non_empty_name:
-        rule: length(node.name) > `1`
-        description: |
-          `name` must be non empty string
-      size_gte_1:
-        rule: node.size > `1`
-        description: |
-          `size` must be 1 or greater
-      size_is_whole:
-        rule: ceil(node.size) == node.size
-        description: |
-          `size` is a whole number without fraction part
-      all_values_same_type:
-        description: all `values` have the same type
-      literal_value_type_match_to_type_field:
-        description: |
-          `values` has the same type as `type`
+      $predifined:
+        - name is not empty
+        - size is an integer
+        - size in between 1 to 100000
       values_length_match_size:
-        description: |
-          `values` length is the same size as `size`
+        rule: length(node.values) == node.size || length(node.values) == 0
+        description: "`values` length must be the same size as `size` or empty"
+
+  FixedVariableDeclaration:
+    name: string
+    size: number
+    values: [ LiteralFixedExpression ]
+    $validations:
+      $predifined:
+        - name is not empty
+        - size is an integer
+        - size in between 1 to 100000
+      values_length_match_size:
+        rule: length(node.values) == node.size || length(node.values) == 0
+        description: "`values` length must be the same size as `size` or empty"
+
+  BooleanVariableDeclaration:
+    name: string
+    size: number
+    values: [ LiteralBooleanExpression ]
+    $validations:
+      $predifined:
+        - name is not empty
+        - size is an integer
+        - size in between 1 to 100000
+      values_length_match_size:
+        rule: length(node.values) == node.size || length(node.values) == 0
+        description: "`values` length must be the same size as `size` or empty"
 
 
 

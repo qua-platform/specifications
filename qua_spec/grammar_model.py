@@ -70,11 +70,20 @@ class TypeProperty:
 
 
 @dataclass
+class PredefinedValidationInfo:
+    original: str
+    property: str
+    name: str
+    args: List[str]
+
+
+@dataclass
 class TypeValidation:
     type_name: str
     name: str
     description: str
     rule: str
+    predefined: Optional[PredefinedValidationInfo]
 
     def validation_ast(self):
         import jmespath
