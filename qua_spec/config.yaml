@@ -39,6 +39,9 @@ types:
     port: number
     filter: AnalogOutputFilterConfig
     offset: number
+    $validations:
+      $predefined:
+        - port is integer
 
   AnalogSingleOutputConfig:
     name: string
