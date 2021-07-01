@@ -97,9 +97,6 @@ types:
     name: string
     samples: [ DigitalWaveformSample ]
 
-  DigtialWaveformReference:
-    name: string
-
   DigitalRouteConfig:
     name: string
     delay: number
