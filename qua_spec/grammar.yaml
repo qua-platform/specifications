@@ -248,7 +248,7 @@ types:
     output: AnalogOutputReference
     oscillator: OptionalOscillator
     chirp: OptionalChirp
-    ampliutude: OptionalAmpMultiplier
+    amplitude: OptionalAmpMultiplier
 
   DigitalPlayPart:
     waveform: DigitalWaveformReference
