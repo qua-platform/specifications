@@ -136,10 +136,7 @@ types:
     $validations:
       $predefined:
         - size is integer
-      non_empty_name:
-        rule: length(node.name) > `1`
-        description: |
-          `name` must be non empty string
+        - name is not empty
       size_gte_1:
         description: |
           `size` must be 1 or greater
@@ -352,27 +349,54 @@ types:
 
   SaveTargetReference:
     tag: string
+    $validations:
+      $predefined:
+        - tag is not empty
     
   AnalogPulseReference:
     name: string
+    $validations:
+      $predefined:
+        - name is not empty
     
   AnalogOutputReference:
     name: string
+    $validations:
+      $predefined:
+        - name is not empty
 
   DigitalWaveformReference:
     name: string
+    $validations:
+      $predefined:
+        - name is not empty
 
   DigitalOutputReference:
     name: string
+    $validations:
+      $predefined:
+        - name is not empty
 
   DigitalInputReference:
     name: string
+    $validations:
+      $predefined:
+        - name is not empty
 
   DigitalRouteReference:
     name: string
+    $validations:
+      $predefined:
+        - name is not empty
     
   OscillatorReference:
     name: string
+    $validations:
+      $predefined:
+        - name is not empty
     
   ThreadReference:
     name: string
+    $validations:
+      $predefined:
+        - name is not empty

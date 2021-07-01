@@ -54,12 +54,16 @@ def _is_integer(txt: str, t: DataType) -> List[TypeValidation]:
     m = re.match(r"^(\w+)\s+is\s+integer$", txt.strip())
     if m:
         prop = m.group(1)
+        if prop not in t.properties.keys():
+            raise Exception(f"unknown property '{prop}' in predefined validation of node '{t.name}'")
+        property_type = t.properties[prop].type
+        rule = f"node.{prop}[].ceil(@) == node.{prop}" if property_type.list else f"ceil(node.{prop}) == node.{prop}"
         return [
             TypeValidation(
                 type_name=t.name,
                 name=f"{prop}_is_integer",
                 description=f"field `{prop}` of `{t.name}` must be an integer",
-                rule=f"ceil(node.{prop}) == node.{prop}",
+                rule=rule,
                 predefined=PredefinedValidationInfo(
                     original=txt,
                     property=prop,

@@ -86,7 +86,7 @@ def _load_type(name, data):
                         predefined=None
                     )
                     for validation_name, item in data.get("$validations", {}).items() if
-                    not validation_name.startswith("$")
+                    not validation_name.startswith("$") and "rule" in item
                 ],
                 [
                     predefined
