@@ -59,16 +59,25 @@ types:
     controller: string
     port: number
     offset: number
+    $validations:
+      $predefined:
+        - port is integer
 
   DigitalOutputConfig:
     name: string
     controller: string
     port: number
+    $validations:
+      $predefined:
+        - port is integer
 
   DigitalInputConfig:
     name: string
     controller: string
     port: number
+    $validations:
+      $predefined:
+        - port is integer
 
   ConstantWaveformConfig:
     name: string
@@ -85,16 +94,25 @@ types:
     name: string
     waveform: AnalogWaveformReference
     length: number
+    $validations:
+      $predefined:
+        - length is integer
 
   MixedPulseConfig:
     name: string
     waveform_I: AnalogWaveformReference
     waveform_Q: AnalogWaveformReference
     length: number
+    $validations:
+      $predefined:
+        - length is integer
 
   DigitalWaveformSample:
     value: boolean
     length: number
+    $validations:
+      $predefined:
+        - length is integer
 
   DigitalWaveformConfig:
     name: string
