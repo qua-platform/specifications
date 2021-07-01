@@ -1,6 +1,9 @@
+import itertools
+
 import yaml
 
 import qua_spec.grammar_model as model
+from qua_spec.predefined_validations import expand_predefined
 
 try:
     import importlib.resources as pkg_resources
@@ -23,7 +26,12 @@ def load_grammar() -> model.GrammarModel:
                 }
             }
     grammar = _load_yaml(grammar_yaml)
-    # make sure each type is defined
+    _validate_all_types_are_defined(grammar)
+
+    return grammar
+
+
+def _validate_all_types_are_defined(grammar: model.GrammarModel):
     for t in grammar.types.values():
         if isinstance(t, model.DataType):
             for prop in t.properties.values():
@@ -36,8 +44,6 @@ def load_grammar() -> model.GrammarModel:
                 elif grammar.types[typeinunion].is_enum:
                     raise Exception(f"union type {t.name} refers to enum type {typeinunion}")
 
-    return grammar
-
 
 def _load_yaml_file(file):
     with open(file, "r") as f:
@@ -48,29 +54,48 @@ def _load_yaml_file(file):
 
 def _load_yaml(data):
     return model.GrammarModel(
-        version=data.get("version"),
+        version=data.get("version", "?"),
         types={
             **{
-                name: model.DataType(name=name, properties={
-                    pname: _to_property(pname, pvalue) for pname, pvalue in data.items() if not pname.startswith("$")
-                }, validations=[
+                name: _load_type(name, data) for name, data in data.get("types", {}).items()
+            },
+            **{
+                name: model.EnumType(name=name, values=data) for name, data in data.get("enums", {}).items()
+            },
+            **{
+                name: model.UnionType(name=name, types=data) for name, data in data.get("unions", {}).items()
+            }
+        }
+    )
+
+
+def _load_type(name, data):
+    no_validation = model.DataType(name=name, properties={
+        pname: _to_property(pname, pvalue) for pname, pvalue in data.items() if not pname.startswith("$")
+    }, validations=[])
+    return model.DataType(**{
+        **no_validation.__dict__,
+        "validations": list(itertools.chain.from_iterable(
+            [
+                [
                     model.TypeValidation(
                         type_name=name,
                         name=validation_name,
                         description=item if type(item) is str else item["description"],
-                        rule=item["rule"] if "rule" in item else None
+                        rule=item["rule"] if "rule" in item else None,
+                        predefined=None
                     )
-                    for validation_name, item in data.get("$validations", {}).items()
-                ]) for name, data in data["types"].items()
-            },
-            **{
-                name: model.EnumType(name=name, values=data) for name, data in data["enums"].items()
-            },
-            **{
-                name: model.UnionType(name=name, types=data) for name, data in data["unions"].items()
-            }
-        }
-    )
+                    for validation_name, item in data.get("$validations", {}).items() if
+                    not validation_name.startswith("$")
+                ],
+                [
+                    predefined
+                    for predefined_rule in data.get("$validations", {}).get("$predefined", [])
+                    for predefined in expand_predefined(predefined_rule, no_validation)
+                ]
+            ]
+        ))
+    })
 
 
 def _to_property(name: str, value):
