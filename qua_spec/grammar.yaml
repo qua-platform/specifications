@@ -311,7 +311,8 @@ types:
   IORefExpression:
     io: number
     $validations:
-      integer: "`io` must be an integer value"
+      $predefined:
+        - io is integer
       gt0: "`io` must be greater than 0"
 
   LiteralFixedExpression:
@@ -319,6 +320,9 @@ types:
 
   LiteralIntegerExpression:
     value: number
+    $validations:
+      $predefined:
+        - value is integer
 
   LiteralBooleanExpression:
     value: boolean
