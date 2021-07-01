@@ -134,6 +134,8 @@ types:
     size: [ number ]
     values: [ LiteralExpression ]
     $validations:
+      $predefined:
+        - size is integer
       non_empty_name:
         rule: length(node.name) > `1`
         description: |
@@ -141,9 +143,6 @@ types:
       size_gte_1:
         description: |
           `size` must be 1 or greater
-      size_is_whole:
-        description: |
-          `size` is a whole number without fraction part
       all_values_same_type:
         description: all `values` have the same type
       literal_value_type_match_to_type_field:
