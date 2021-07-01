@@ -101,6 +101,11 @@ unions:
   AnyMemoryExpression:
     - VarRefExpression
 
+  AnyVariableDeclaration:
+    - IntegerVariableDeclaration
+    - FixedVariableDeclaration
+    - BooleanVariableDeclaration
+
 types:
 
   Program:
@@ -108,7 +113,7 @@ types:
     config: Config
 
   Script:
-    variables: [ VariableDeclaration ]
+    variables: [ AnyVariableDeclaration ]
     body: BlockStatement
 
   BlockStatement:
