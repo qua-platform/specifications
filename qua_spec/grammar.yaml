@@ -358,7 +358,10 @@ types:
     $validations:
       $predefined:
         - name is not empty
-    
+      pulse_in_config:
+        rule: contains(root.config.analog_pulses[].name, node.name)
+        description: The pulse "{`name`}" was not defined in config
+
   AnalogOutputReference:
     name: string
     $validations:
