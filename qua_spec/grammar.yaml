@@ -59,6 +59,7 @@ unions:
     - ParallelStatement
     - AlignStatement
     - WaitForTriggerStatement
+    - PauseStatement
 
   LiteralExpression:
     - LiteralFixedExpression
