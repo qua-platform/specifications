@@ -275,7 +275,7 @@ types:
   PlayStatement:
     qe: QuantumElementReference
     pulse: AnyPulseType
-    ampliutude: AmpMultiplier
+    amplitude: AmpMultiplier
     duration: AnyExpression
     condition: AnyExpression
     targetInput: string
