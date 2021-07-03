@@ -11,6 +11,7 @@ def generate():
             filters={
             }
         ),
+        output_transform=prettify_json,
         jobs=[
             RenderJob(
                 template="json_schema.jinja2",
@@ -19,6 +20,12 @@ def generate():
             )
         ]
     ))
+
+
+def prettify_json(s: str) -> str:
+    import json
+    j = json.loads(s)
+    return json.dumps(j, indent=2)
 
 
 if __name__ == '__main__':
