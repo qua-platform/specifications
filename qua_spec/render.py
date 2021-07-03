@@ -1,4 +1,4 @@
-from typing import List, Any, Optional, Dict, Callable
+from typing import List, Any, Optional, Dict, Callable, Union
 from jinja2 import Environment, select_autoescape, FileSystemLoader
 from dataclasses import dataclass
 import shutil
@@ -37,12 +37,18 @@ class RenderJob:
     data: Any
 
 
+def _default_clear_callback(output: str):
+    shutil.rmtree(output, ignore_errors=True)
+
+
 @dataclass
 class RenderConfig:
     output: str
     templates: str
     jobs: List[RenderJob]
     env: Optional[RenderingEnv] = None
+    clear_callback: Callable[[str], None] = _default_clear_callback
+    output_transform: Callable[[str], str] = lambda x: x
 
 
 _default_env = Environment()
@@ -60,7 +66,7 @@ def render(config: RenderConfig):
         for name, filter in config.env.filters.items():
             env.filters[name] = filter
 
-    shutil.rmtree(config.output, ignore_errors=True)
+    config.clear_callback(config.output)
     os.makedirs(config.output, exist_ok=True)
     for job in config.jobs:
         tpl = env.get_template(job.template)
@@ -68,4 +74,6 @@ def render(config: RenderConfig):
         output_file = os.path.join(config.output, job.output)
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         with open(output_file, "w+") as f:
+            if config.output_transform:
+                output = config.output_transform(output)
             f.write(output)
