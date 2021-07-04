@@ -1,0 +1,140 @@
+#
+# A type can be one of:
+#
+$schema: https://qualang.io/2021.1/ast_ext.schema.json#
+
+enums: {}
+
+unions:
+  AnalogOutputConfig:
+    - AnalogSingleOutputConfig
+    - AnalogMixedOutputConfig
+
+  AnalogWaveformConfig:
+    - ConstantWaveformConfig
+    - ArbitraryWaveformConfig
+
+  AnalogPulseConfig:
+    - SinglePulseConfig
+    - MixedPulseConfig
+
+types:
+
+  Config:
+    analog_outputs: [ AnalogOutputConfig ]
+    analog_inputs: [ AnalogInputConfig ]
+    digital_outputs: [ DigitalOutputConfig ]
+    digital_inputs: [ DigitalInputConfig ]
+    oscillators: [ OscillatorConfig ]
+    analog_waveforms: [ AnalogWaveformConfig ]
+    analog_pulses: [ AnalogPulseConfig ]
+    digital_waveforms: [ DigitalWaveformConfig ]
+    digital_routes: [ DigitalRouteConfig ]
+
+  AnalogOutputFilterConfig:
+    feed_forward: [ number ]
+    feed_back: [ number ]
+
+  AnalogOutputPortConfig:
+    port: number
+    filter: AnalogOutputFilterConfig
+    offset: number
+    $validations:
+      $predefined:
+        - port is integer
+
+  AnalogSingleOutputConfig:
+    name: string
+    controller: string
+    port: AnalogOutputPortConfig
+
+  AnalogMixedOutputConfig:
+    name: string
+    controller: string
+    port_I: AnalogOutputPortConfig
+    port_Q: AnalogOutputPortConfig
+
+  AnalogInputConfig:
+    name: string
+    controller: string
+    port: number
+    offset: number
+    $validations:
+      $predefined:
+        - port is integer
+
+  DigitalOutputConfig:
+    name: string
+    controller: string
+    port: number
+    $validations:
+      $predefined:
+        - port is integer
+
+  DigitalInputConfig:
+    name: string
+    controller: string
+    port: number
+    $validations:
+      $predefined:
+        - port is integer
+
+  ConstantWaveformConfig:
+    name: string
+    sample: number
+
+  ArbitraryWaveformConfig:
+    name: string
+    samples: [number]
+
+  AnalogWaveformReference:
+    name: string
+
+  SinglePulseConfig:
+    name: string
+    waveform: AnalogWaveformReference
+    length: number
+    $validations:
+      $predefined:
+        - length is integer
+
+  MixedPulseConfig:
+    name: string
+    waveform_I: AnalogWaveformReference
+    waveform_Q: AnalogWaveformReference
+    length: number
+    $validations:
+      $predefined:
+        - length is integer
+
+  DigitalWaveformSample:
+    value: boolean
+    length: number
+    $validations:
+      $predefined:
+        - length is integer
+
+  DigitalWaveformConfig:
+    name: string
+    samples: [ DigitalWaveformSample ]
+
+  DigitalOutputReference:
+    name: string
+
+  DigitalRouteConfig:
+    name: string
+    delay: number
+    buffer: number
+    outputs: [DigitalOutputReference]
+
+  CorrectionMatrixConfig:
+    v00: number
+    v01: number
+    v10: number
+    v11: number
+
+  OscillatorConfig:
+    name: string
+    intermediate_frequency: number
+    correction_matix: CorrectionMatrixConfig
+

@@ -1,0 +1,377 @@
+#
+# A type can be one of:
+#
+$schema: https://qualang.io/2021.1/ast.schema.json#
+version: 1.0.0-draft
+
+imports:
+  - qua1_config
+
+enums:
+  QuaPrimitiveType:
+    - Int
+    - Fixed
+    - Boolean
+
+  UpdateFrequencyUnits:
+    - Hz
+    - mHz
+    - uHz
+    - nHz
+    - pHz
+
+  ChirpUnit:
+    - HzPerNanoSec
+    - mHzPerNanoSec
+    - uHzPerNanoSec
+    - nHzPerNanoSec
+    - pHzPerNanoSec
+
+  BinaryOperator:
+    - ADD
+    - SUB
+    - MULT
+    - DIV
+    # binary operators
+    - AND
+    - OR
+    - XOR
+    # comparisons
+    - LT
+    - LET
+    - GT
+    - GET
+    - EQ
+    # shifts
+    - SHL
+    - SHR
+
+unions:
+  AnyStatement:
+    - PlayStatement
+    - MeasureStatement
+    - WaitStatement
+    - IfStatement
+    - AssignmentStatement
+    - ForStatement
+    - RusStatement
+    - AlignStatement
+    - UpdateFrequencyStatement
+    - ZRotationStatement
+    - PauseStatement
+    - SaveStatement
+    - ForEachStatement
+    - WaitForTriggerStatement
+    - StrictTimingBlockStatement
+    - UpdateCorrectionStatement
+    - ResetPhaseStatement
+    - RampToZeroStatement
+    - ResetFrameStatement
+
+  LiteralExpression:
+    - LiteralFixedExpression
+    - LiteralIntegerExpression
+    - LiteralBooleanExpression
+
+  AnyPulseType:
+    - PulseReference
+    - RampPulse
+
+  AnyMeasureProcess:
+    - AnyAnalogMeasureProcess
+
+  AnyAnalogMeasureProcess:
+    - BareIntegration
+    - DemodIntegration
+    - DualBareIntegration
+    - DualDemodIntegration
+    - RawTimeTagging
+
+  AnyExpression:
+    - VarRefExpression
+    - IORefExpression
+    - LiteralExpression
+    - BinaryExpression
+
+  AnySaveableExpression:
+    - VarRefExpression
+    - IORefExpression
+    - LiteralExpression
+
+  AnyMemoryExpression:
+    - VarRefExpression
+
+  AnyVariableDeclaration:
+    - IntegerVariableDeclaration
+    - FixedVariableDeclaration
+    - BooleanVariableDeclaration
+
+types:
+
+  Program:
+    script: Script
+    config: Config
+
+  Script:
+    variables: [ AnyVariableDeclaration ]
+    body: BlockStatement
+
+  BlockStatement:
+    statements: [ AnyStatement ]
+
+  IntegerVariableDeclaration:
+    name: string
+    size: number
+    values: [ LiteralIntegerExpression ]
+    $validations:
+      $predifined:
+        - name is not empty
+        - size is an integer
+        - size in between 1 to 100000
+      values_length_match_size:
+        rule: length(node.values) == node.size || length(node.values) == 0
+        description: "`values` length must be the same size as `size` or empty"
+
+  FixedVariableDeclaration:
+    name: string
+    size: number
+    values: [ LiteralFixedExpression ]
+    $validations:
+      $predifined:
+        - name is not empty
+        - size is an integer
+        - size in between 1 to 100000
+      values_length_match_size:
+        rule: length(node.values) == node.size || length(node.values) == 0
+        description: "`values` length must be the same size as `size` or empty"
+
+  BooleanVariableDeclaration:
+    name: string
+    size: number
+    values: [ LiteralBooleanExpression ]
+    $validations:
+      $predifined:
+        - name is not empty
+        - size is an integer
+        - size in between 1 to 100000
+      values_length_match_size:
+        rule: length(node.values) == node.size || length(node.values) == 0
+        description: "`values` length must be the same size as `size` or empty"
+
+
+
+
+  MeasureStatement: { }
+
+  WaitStatement:
+    qe: [ QuantumElementReference ]
+    time: AnyExpression
+
+  IfStatement:
+    condition: AnyExpression
+    body: [AnyStatement]
+    else_if: [ElseIfPart]
+    else_body: [AnyStatement]
+    $validations:
+      condition_is_boolean: "`condition` expression is boolean"
+
+  ElseIfPart:
+    condition: AnyExpression
+    body: [AnyStatement]
+    $validations:
+      condition_is_boolean: "`condition` expression is boolean"
+
+  AssignmentStatement:
+    lhs: AnyMemoryExpression
+    rhs: AnyExpression
+
+
+  ForStatement:
+    init: [AssignmentStatement]
+    condition: AnyExpression
+    update: [AssignmentStatement]
+    body: [AnyStatement]
+    $validations:
+      condition_is_boolean: "`condition` expression is boolean"
+
+  RusStatement:
+    body: [ AnyStatement ]
+    until: AnyExpression
+    fail: [ AnyStatement ]
+    $validations:
+      until_is_boolean: "`until` expression is boolean"
+
+  AlignStatement:
+    qe: [ QuantumElementReference ]
+
+  UpdateFrequencyStatement:
+    qe: QuantumElementReference
+    value: AnyExpression
+    units: UpdateFrequencyUnits
+    keep_phase: boolean
+
+  ZRotationStatement:
+    qe: QuantumElementReference
+    value: AnyExpression
+
+  PauseStatement:
+    qe: [QuantumElementReference]
+
+  SaveStatement:
+    source: AnySaveableExpression
+    target: SaveTargetReference
+
+  VarIterablePair:
+    variable: VarRefExpression
+    values: VarRefExpression
+
+    $validations:
+      variable_scalar: "`variable` must be a scalar variable"
+      values_array: "`values` must be an array of values"
+      match_types: "`variable` type must match the items type of `values`"
+
+  ForEachStatement:
+    pairs: [VarIterablePair]
+    body: [AnyStatement]
+    $validations:
+      # TODO: do we need this requirement?
+      has_pairs: "`pairs` must be non-empty"
+
+  WaitForTriggerStatement:
+    qe: QuantumElementReference
+    pulse_to_play: PulseReference
+
+  StrictTimingBlockStatement:
+    qe: QuantumElementReference
+    body: [AnyStatement]
+
+  UpdateCorrectionStatement:
+    qe: QuantumElementReference
+    correction: Correction
+
+  Matrix:
+    v00: AnyExpression
+    v01: AnyExpression
+    v10: AnyExpression
+    v11: AnyExpression
+
+  Correction:
+    matrix: Matrix
+
+  ResetPhaseStatement:
+    qe: QuantumElementReference
+
+  RampToZeroStatement:
+    qe: QuantumElementReference
+    duration: number
+
+  ResetFrameStatement:
+    qe: QuantumElementReference
+
+
+
+  #### PULSE
+
+  PlayStatement:
+    qe: QuantumElementReference
+    pulse: AnyPulseType
+    amplitude: AmpMultiplier
+    duration: AnyExpression
+    condition: AnyExpression
+    targetInput: string
+    chirp: Chirp
+    truncate: AnyExpression
+
+  AmpMultiplier:
+    v0: AnyExpression
+    v1: AnyExpression
+    v2: AnyExpression
+    v3: AnyExpression
+
+  RampPulse:
+    value: AnyExpression
+
+  Chirp:
+    rate: AnyExpression
+    unit: ChirpUnit
+    times: [ number ]
+
+  ### Measurement
+
+  BareIntegration:
+    integration: IntegrationWeightReference
+    target: AnyMemoryExpression
+
+  DualBareIntegration:
+    integration1: IntegrationWeightReference
+    integration2: IntegrationWeightReference
+    target: AnyMemoryExpression
+    elementOutput1: string
+    elementOutput2: string
+
+  DemodIntegration:
+    integration: IntegrationWeightReference
+    target: AnyMemoryExpression
+    elementOutput: string
+
+  DualDemodIntegration:
+    integration1: IntegrationWeightReference
+    integration2: IntegrationWeightReference
+    target: AnyMemoryExpression
+    elementOutput1: string
+    elementOutput2: string
+
+  RawTimeTagging:
+    target: AnyMemoryExpression
+    targetLen: VarRefExpression # TODO: should be expression?
+    maxTime: number
+    elementOutput: string
+
+  ########################## EXPRESSIONS
+
+
+  VarRefExpression:
+    variable: string
+
+  IORefExpression:
+    io: number
+    $validations:
+      integer: "`io` must be an integer value"
+      gt0: "`io` must be greater than 0"
+
+  LiteralFixedExpression:
+    value: number
+
+  LiteralIntegerExpression:
+    value: number
+    $validation:
+      range: [-100, 100]
+      precision: 0
+
+  LiteralBooleanExpression:
+    value: boolean
+    $validation:
+      range: [-100, 100]
+
+  BinaryExpression:
+    op: BinaryOperator
+    left: AnyExpression
+    right: AnyExpression
+
+  ######################### REFERENCES
+
+  QuantumElementReference:
+    el: string
+
+  PulseReference:
+    pulse: string
+    $validations:
+      pulse_not_defined:
+        rule: contains(root.config.pulses[].name, node.pulse)
+        description: The `pulse` was not defined in config
+
+  IntegrationWeightReference:
+    integrationWeight: string
+
+  SaveTargetReference:
+    tag: string

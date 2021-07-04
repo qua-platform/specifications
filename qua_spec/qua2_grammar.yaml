@@ -1,0 +1,406 @@
+#
+# A type can be one of:
+#
+$schema: https://qualang.io/2021.1/ast.schema.json#
+version: 2.0.0-draft
+
+imports:
+  - qua2_config
+
+enums:
+  QuaPrimitiveType:
+    - Int
+    - Fixed
+    - Boolean
+    
+  UnaryOperator:
+    - NEG
+    - NOT
+
+  BinaryOperator:
+    - ADD
+    - SUB
+    - MULT
+    - DIV
+    # binary operators
+    - AND
+    - OR
+    - XOR
+    # comparisons
+    - LT
+    - LET
+    - GT
+    - GET
+    - EQ
+    # shifts
+    - SHL
+    - SHR
+
+  ChirpUnit:
+    - HzPerNanoSec
+    - mHzPerNanoSec
+    - uHzPerNanoSec
+    - nHzPerNanoSec
+    - pHzPerNanoSec
+
+unions:
+  AnyStatement:
+    - AssignmentStatement
+    - SaveStatement
+    - ForStatement
+    - WhileStatement
+    - IfStatement
+    - BreakStatement
+    - ContinueStatement
+    - SwitchStatement
+    - SequenceStatement
+    - PlayStatement
+    - WaitStatement
+    - ParallelStatement
+    - AlignStatement
+    - WaitForTriggerStatement
+    - PauseStatement
+
+  LiteralExpression:
+    - LiteralFixedExpression
+    - LiteralIntegerExpression
+    - LiteralBooleanExpression
+
+  AnyExpression:
+    - VarRefExpression
+    - ArrayCellExpression
+    - IORefExpression
+    - LiteralExpression
+    - BinaryExpression
+    - UnaryExpression
+    - LibFunctionExpression
+    
+  AnyTargetExpression:
+    - VarRefExpression
+    - ArrayCellExpression
+    - IORefExpression
+    
+  AnyIterableExpression:
+    - VarRefExpression
+    - RangeExpression
+
+  PlayPart:
+    - AnalogPlayPart
+    - DigitalPlayPart
+
+  AnyAnalogPulse:
+    - AnalogPulseReference
+    - RampPulse
+
+  OptionalChirp:
+    - Chirp
+    - NoChirp
+
+  OptionalAmpMultiplier:
+    - AmpMultiplier
+    - NoAmpMultiplier
+
+  OptionalDuration:
+    - Duration
+    - NoDuration
+
+  OptionalCondition:
+    - Condition
+    - NoCondition
+
+  OptionalTruncate:
+    - Truncate
+    - NoTruncate
+
+  OptionalOscillator:
+    - OscillatorReference
+    - NoOscillator
+
+types:
+
+  Program:
+    script: Script
+    config: Config
+
+  Script:
+    variables: [ VariableDeclaration ]
+    body: BlockStatement
+
+  BlockStatement:
+    statements: [ AnyStatement ]
+
+  VariableDeclaration:
+    name: string
+    type: QuaPrimitiveType
+    size: [ number ]
+    values: [ LiteralExpression ]
+    $validations:
+      $predefined:
+        - size is integer
+        - name is not empty
+      size_gte_1:
+        description: |
+          `size` must be 1 or greater
+      all_values_same_type:
+        description: all `values` have the same type
+      literal_value_type_match_to_type_field:
+        description: |
+          `values` has the same type as `type`
+      values_length_match_size:
+        description: |
+          `values` length is the same size as `size`
+
+
+  ########################## STATEMENTS
+
+  AssignmentStatement:
+    lhs: AnyTargetExpression
+    rhs: AnyExpression
+    
+  SaveStatement:
+    source: AnyExpression
+    target: SaveTargetReference
+  
+  VarIterablePair:
+    variable: VarRefExpression
+    values: AnyIterableExpression
+    $validations:
+      variable_scalar: "`variable` must be a scalar variable"
+      values_array: "`values` must be an array of values"
+      match_types: "`variable` type must match the items type of `values`"
+  
+  ForStatement:
+    pairs: [VarIterablePair]
+    body: [AnyStatement]
+    $validations:
+      size_of_iterator_is_one: "size of `iterator` is one"
+      
+  WhileStatement:
+    condition: AnyExpression
+    body: [AnyStatement]
+    $validations:
+      condition_is_boolean: "`condition` expression is boolean"
+    
+  IfStatement:
+    condition: AnyExpression
+    body: [AnyStatement]
+    else_if: [ElseIfPart]
+    else_body: [AnyStatement]
+    $validations:
+      condition_is_boolean: "`condition` expression is boolean"
+
+  ElseIfPart:
+    condition: AnyExpression
+    body: [AnyStatement]
+    $validations:
+      condition_is_boolean: "`condition` expression is boolean"
+
+  BreakStatement: 
+    $validations:
+      break_inside_loop: "`break` statement is inside a loop"
+      
+  ContinueStatement: 
+    $validations:
+      break_inside_loop: "`continue` statement is inside a loop"
+
+  SwitchStatement:
+    expression: AnyExpression
+    cases: [CasePart]
+    default: [AnyStatement]
+  
+  CasePart:
+    case: AnyExpression
+    body: [AnyStatement]
+    $validations:
+      case_type_match_switch_expression_type: "case type match switch expression type"
+      
+  SequenceStatement:
+    body: [AnyStatement]
+
+  NoAmpMultiplier: {}
+
+  AmpMultiplier:
+    v00: AnyExpression
+    v01: AnyExpression
+    v10: AnyExpression
+    v11: AnyExpression
+
+  NoChirp: {}
+
+  Chirp:
+    rate: ChirpRates
+    unit: ChirpUnit
+    
+  ChirpRates:
+    rate: AnyExpression
+    time: number
+
+  RampPulse:
+    slope: AnyExpression
+    base: AnyExpression
+
+  NoOscillator: {}
+
+  AnalogPlayPart:
+    pulse: AnyAnalogPulse
+    output: AnalogOutputReference
+    oscillator: OptionalOscillator
+    chirp: OptionalChirp
+    amplitude: OptionalAmpMultiplier
+
+  DigitalPlayPart:
+    waveform: DigitalWaveformReference
+    route: DigitalRouteReference
+
+  NoDuration: {}
+
+  Duration:
+    value: AnyExpression
+
+  NoCondition: {}
+
+  Condition:
+    value: AnyExpression
+
+  NoTruncate: {}
+
+  Truncate:
+    value: AnyExpression
+  
+  PlayStatement:
+    plays: [PlayPart]
+    duration: OptionalDuration
+    condition: OptionalCondition
+    truncate: OptionalTruncate
+  
+  WaitStatement:
+    time: AnyExpression
+
+  ParallelStatement:
+    threads: [ThreadPart]
+    
+  ThreadPart:
+    name: string
+    body: [AnyStatement]
+    
+  AlignStatement:
+    threads: [ ThreadReference ]
+
+  PauseStatement: {}
+
+  WaitForTriggerStatement:
+    input: DigitalInputReference
+    plays: [PlayPart]
+
+
+
+  ########################## EXPRESSIONS
+
+
+  VarRefExpression:
+    variable: string
+    
+  ArrayCellExpression:
+    array: VarRefExpression
+    index: AnyExpression
+    $validations:
+      integer: "`index` must be an integer expression"
+
+  IORefExpression:
+    io: number
+    $validations:
+      $predefined:
+        - io is integer
+      gt0: "`io` must be greater than 0"
+
+  LiteralFixedExpression:
+    value: number
+
+  LiteralIntegerExpression:
+    value: number
+    $validations:
+      $predefined:
+        - value is integer
+
+  LiteralBooleanExpression:
+    value: boolean
+
+  BinaryExpression:
+    op: BinaryOperator
+    left: AnyExpression
+    right: AnyExpression
+    
+  UnaryExpression:
+    op: UnaryOperator
+    operand: AnyExpression
+    
+  LibFunctionExpression:
+    library_name: string
+    function_name: string
+    positioned_arguments: [AnyExpression]
+
+  RangeExpression:
+    from: AnyExpression
+    to: AnyExpression
+    step: AnyExpression
+
+
+  ######################### REFERENCES
+
+
+  SaveTargetReference:
+    tag: string
+    $validations:
+      $predefined:
+        - tag is not empty
+    
+  AnalogPulseReference:
+    name: string
+    $validations:
+      $predefined:
+        - name is not empty
+      pulse_in_config:
+        rule: contains(root.config.analog_pulses[].name, node.name)
+        description: The pulse "{`name`}" was not defined in config
+
+  AnalogOutputReference:
+    name: string
+    $validations:
+      $predefined:
+        - name is not empty
+
+  DigitalWaveformReference:
+    name: string
+    $validations:
+      $predefined:
+        - name is not empty
+
+  DigitalOutputReference:
+    name: string
+    $validations:
+      $predefined:
+        - name is not empty
+
+  DigitalInputReference:
+    name: string
+    $validations:
+      $predefined:
+        - name is not empty
+
+  DigitalRouteReference:
+    name: string
+    $validations:
+      $predefined:
+        - name is not empty
+    
+  OscillatorReference:
+    name: string
+    $validations:
+      $predefined:
+        - name is not empty
+    
+  ThreadReference:
+    name: string
+    $validations:
+      $predefined:
+        - name is not empty

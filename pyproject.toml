@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "qua-spec"
+version = "0.1.0"
+description = ""
+authors = ["Tal Shani <tal@quantum-machines.co>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+PyYAML = "^5.4.1"
+Jinja2 = "^3.0.1"
+jmespath = "^0.10.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
