@@ -124,9 +124,9 @@ types:
 
   Script:
     variables: [ VariableDeclaration ]
-    body: BlockStatement
+    body: StatementCollection
 
-  BlockStatement:
+  StatementCollection:
     statements: [ AnyStatement ]
 
   VariableDeclaration:
@@ -171,27 +171,27 @@ types:
   
   ForStatement:
     pairs: [VarIterablePair]
-    body: [AnyStatement]
+    body: StatementCollection
     $validations:
       size_of_iterator_is_one: "size of `iterator` is one"
       
   WhileStatement:
     condition: AnyExpression
-    body: [AnyStatement]
+    body: StatementCollection
     $validations:
       condition_is_boolean: "`condition` expression is boolean"
     
   IfStatement:
     condition: AnyExpression
-    body: [AnyStatement]
+    body: StatementCollection
     else_if: [ElseIfPart]
-    else_body: [AnyStatement]
+    else_body: StatementCollection
     $validations:
       condition_is_boolean: "`condition` expression is boolean"
 
   ElseIfPart:
     condition: AnyExpression
-    body: [AnyStatement]
+    body: StatementCollection
     $validations:
       condition_is_boolean: "`condition` expression is boolean"
 
@@ -206,16 +206,16 @@ types:
   SwitchStatement:
     expression: AnyExpression
     cases: [CasePart]
-    default: [AnyStatement]
+    default: StatementCollection
   
   CasePart:
     case: AnyExpression
-    body: [AnyStatement]
+    body: StatementCollection
     $validations:
       case_type_match_switch_expression_type: "case type match switch expression type"
       
   SequenceStatement:
-    body: [AnyStatement]
+    body: StatementCollection
 
   NoAmpMultiplier: {}
 
@@ -281,7 +281,7 @@ types:
     
   ThreadPart:
     name: string
-    body: [AnyStatement]
+    body: StatementCollection
     
   AlignStatement:
     threads: [ ThreadReference ]
