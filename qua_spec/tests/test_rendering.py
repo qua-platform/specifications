@@ -5,7 +5,7 @@ import os
 def test_render():
     render(config=RenderConfig(
         output="out",
-        templates=f"{os.path.join(__file__, '../templates')}",
+        templates=f"{os.path.abspath(os.path.join(__file__, '../templates'))}",
         jobs=[
             RenderJob(
                 "oop.jinja2",
