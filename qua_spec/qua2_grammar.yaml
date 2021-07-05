@@ -165,21 +165,26 @@ types:
     variable: VarRefExpression
     values: AnyIterableExpression
     $validations:
-      variable_scalar: "`variable` must be a scalar variable"
-      values_array: "`values` must be an array of values"
-      match_types: "`variable` type must match the items type of `values`"
+      variable_scalar: 
+        description: "`variable` must be a scalar variable"
+      values_array: 
+        description: "`values` must be an array of values"
+      match_types: 
+        description: "`variable` type must match the items type of `values`"
   
   ForStatement:
     pairs: [VarIterablePair]
     body: StatementCollection
     $validations:
-      size_of_iterator_is_one: "size of `iterator` is one"
+      size_of_iterator_is_one: 
+        description: "size of `iterator` is one"
       
   WhileStatement:
     condition: AnyExpression
     body: StatementCollection
     $validations:
-      condition_is_boolean: "`condition` expression is boolean"
+      condition_is_boolean: 
+        description: "`condition` expression is boolean"
     
   IfStatement:
     condition: AnyExpression
@@ -187,21 +192,25 @@ types:
     else_if: [ElseIfPart]
     else_body: StatementCollection
     $validations:
-      condition_is_boolean: "`condition` expression is boolean"
+      condition_is_boolean: 
+        description: "`condition` expression is boolean"
 
   ElseIfPart:
     condition: AnyExpression
     body: StatementCollection
     $validations:
-      condition_is_boolean: "`condition` expression is boolean"
+      condition_is_boolean: 
+        description: "`condition` expression is boolean"
 
   BreakStatement: 
     $validations:
-      break_inside_loop: "`break` statement is inside a loop"
+      break_inside_loop: 
+        description: "`break` statement is inside a loop"
       
   ContinueStatement: 
     $validations:
-      break_inside_loop: "`continue` statement is inside a loop"
+      break_inside_loop: 
+        description: "`continue` statement is inside a loop"
 
   SwitchStatement:
     expression: AnyExpression
@@ -212,7 +221,8 @@ types:
     case: AnyExpression
     body: StatementCollection
     $validations:
-      case_type_match_switch_expression_type: "case type match switch expression type"
+      case_type_match_switch_expression_type: 
+        description: "case type match switch expression type"
       
   SequenceStatement:
     body: StatementCollection
@@ -304,14 +314,16 @@ types:
     array: VarRefExpression
     index: AnyExpression
     $validations:
-      integer: "`index` must be an integer expression"
+      integer: 
+        description: "`index` must be an integer expression"
 
   IORefExpression:
     io: number
     $validations:
       $predefined:
         - io is integer
-      gt0: "`io` must be greater than 0"
+      gt0: 
+        description: "`io` must be greater than 0"
 
   LiteralFixedExpression:
     value: number
