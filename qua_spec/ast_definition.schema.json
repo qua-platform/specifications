@@ -1,0 +1,80 @@
+{
+    "$id": "https://qualang.io/schemas/v2021.1/ast_definition.schema.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type":"object",
+    "properties": {
+        "$schema": {"type":"string", "const":"https://qualang.io/schemas/v2021.1/ast_definition.schema.json#"},
+        "version": {"type":"string"},
+        "imports": {
+            "type":"array",
+            "items": {
+                "type":"string"
+            }
+        },
+        "enums": {
+            "type":"object",
+            "patternProperties": {
+                "^[A-Z][a-zA-Z0-9]*$": {"type":"array", "items":{"type":"string"}}
+            },
+            "additionalProperties": false
+        },
+        "unions": {
+            "type":"object",
+            "patternProperties": {
+                "^[A-Z][a-zA-Z0-9]*$": {"type":"array", "items":{"type":"string", "pattern": "^[A-Z][a-zA-Z0-9]*$"}}
+            },
+            "additionalProperties": false
+        },
+        "types": {
+            "type":"object",
+            "patternProperties": {
+                "^[A-Z][a-zA-Z0-9]*$": {"$ref":"#/definitions/DataType"}
+            },
+            "additionalProperties": false
+        }
+    },
+    "definitions": {
+        "DataType": {
+            "type":"object",
+            "properties": {
+                "$validations": {"$ref":"#/definitions/Validations"}
+            },
+            "patternProperties": {
+                "^[a-z][a-z_0-9]*$": {"$ref":"#/definitions/AnyTypeReference"}
+            },
+            "additionalProperties": false
+        },
+        "Primitive": {
+            "type":"string",
+            "enum": ["string", "number", "boolean"]
+        },
+        "AnyTypeReference": {
+            "oneOf": [
+                {"type":"array", "items":{"type":"string", "pattern": "^[A-Z][a-zA-Z0-9]*$"}, "maxItems": 1, "minItems":1},
+                {"type":"string", "pattern": "^[A-Z][a-zA-Z0-9]*$"},
+                {"$ref":"#/definitions/Primitive"},
+                {"type":"array", "items":{"$ref":"#/definitions/Primitive"}, "maxItems": 1, "minItems":1}
+            ]
+        },
+        "Validations": {
+            "type":"object",
+            "properties": {
+                "$predefined": {
+                    "type":"array",
+                    "items": {"type":"string"}
+                }
+            },
+            "patternProperties": {
+                "^[a-z][a-z_0-9]*$": {
+                    "type":"object",
+                    "properties": {
+                        "rule": {"type":"string"},
+                        "description": {"type":"string"}
+                    }
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

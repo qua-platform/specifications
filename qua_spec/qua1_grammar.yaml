@@ -1,7 +1,7 @@
 #
 # A type can be one of:
 #
-$schema: https://qualang.io/2021.1/ast.schema.json#
+$schema: https://qualang.io/schemas/v2021.1/ast_definition.schema.json#
 version: 1.0.0-draft
 
 imports:
@@ -173,7 +173,9 @@ types:
     else_if: [ElseIfPart]
     else_body: [AnyStatement]
     $validations:
-      condition_is_boolean: "`condition` expression is boolean"
+      condition_is_boolean:
+        rule: ""
+        description: "`condition` expression is boolean"
 
   ElseIfPart:
     condition: AnyExpression
