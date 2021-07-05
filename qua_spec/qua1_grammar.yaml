@@ -124,7 +124,7 @@ types:
     size: number
     values: [ LiteralIntegerExpression ]
     $validations:
-      $predifined:
+      $predefined:
         - name is not empty
         - size is an integer
         - size in between 1 to 100000
@@ -137,7 +137,7 @@ types:
     size: number
     values: [ LiteralFixedExpression ]
     $validations:
-      $predifined:
+      $predefined:
         - name is not empty
         - size is an integer
         - size in between 1 to 100000
@@ -150,7 +150,7 @@ types:
     size: number
     values: [ LiteralBooleanExpression ]
     $validations:
-      $predifined:
+      $predefined:
         - name is not empty
         - size is an integer
         - size in between 1 to 100000
@@ -181,7 +181,8 @@ types:
     condition: AnyExpression
     body: [AnyStatement]
     $validations:
-      condition_is_boolean: "`condition` expression is boolean"
+      condition_is_boolean: 
+        description: "`condition` expression is boolean"
 
   AssignmentStatement:
     lhs: AnyMemoryExpression
@@ -194,14 +195,16 @@ types:
     update: [AssignmentStatement]
     body: [AnyStatement]
     $validations:
-      condition_is_boolean: "`condition` expression is boolean"
+      condition_is_boolean:
+        description: "`condition` expression is boolean"
 
   RusStatement:
     body: [ AnyStatement ]
     until: AnyExpression
     fail: [ AnyStatement ]
     $validations:
-      until_is_boolean: "`until` expression is boolean"
+      until_is_boolean:
+        description: "`until` expression is boolean"
 
   AlignStatement:
     qe: [ QuantumElementReference ]
@@ -228,16 +231,20 @@ types:
     values: VarRefExpression
 
     $validations:
-      variable_scalar: "`variable` must be a scalar variable"
-      values_array: "`values` must be an array of values"
-      match_types: "`variable` type must match the items type of `values`"
+      variable_scalar: 
+        description: "`variable` must be a scalar variable"
+      values_array: 
+        description: "`values` must be an array of values"
+      match_types: 
+        description: "`variable` type must match the items type of `values`"
 
   ForEachStatement:
     pairs: [VarIterablePair]
     body: [AnyStatement]
     $validations:
       # TODO: do we need this requirement?
-      has_pairs: "`pairs` must be non-empty"
+      has_pairs: 
+        description: "`pairs` must be non-empty"
 
   WaitForTriggerStatement:
     qe: QuantumElementReference
@@ -280,7 +287,7 @@ types:
     amplitude: AmpMultiplier
     duration: AnyExpression
     condition: AnyExpression
-    targetInput: string
+    target_input: string
     chirp: Chirp
     truncate: AnyExpression
 
@@ -308,26 +315,26 @@ types:
     integration1: IntegrationWeightReference
     integration2: IntegrationWeightReference
     target: AnyMemoryExpression
-    elementOutput1: string
-    elementOutput2: string
+    element_output1: string
+    element_output2: string
 
   DemodIntegration:
     integration: IntegrationWeightReference
     target: AnyMemoryExpression
-    elementOutput: string
+    element_output: string
 
   DualDemodIntegration:
     integration1: IntegrationWeightReference
     integration2: IntegrationWeightReference
     target: AnyMemoryExpression
-    elementOutput1: string
-    elementOutput2: string
+    element_output1: string
+    element_output2: string
 
   RawTimeTagging:
     target: AnyMemoryExpression
-    targetLen: VarRefExpression # TODO: should be expression?
-    maxTime: number
-    elementOutput: string
+    target_len: VarRefExpression # TODO: should be expression?
+    max_time: number
+    element_output: string
 
   ########################## EXPRESSIONS
 
@@ -338,22 +345,21 @@ types:
   IORefExpression:
     io: number
     $validations:
-      integer: "`io` must be an integer value"
-      gt0: "`io` must be greater than 0"
+      integer: 
+        description: "`io` must be an integer value"
+      gt0: 
+        description: "`io` must be greater than 0"
 
   LiteralFixedExpression:
     value: number
 
   LiteralIntegerExpression:
     value: number
-    $validation:
-      range: [-100, 100]
-      precision: 0
+    $validations: {}
 
   LiteralBooleanExpression:
     value: boolean
-    $validation:
-      range: [-100, 100]
+    $validations: {}
 
   BinaryExpression:
     op: BinaryOperator
@@ -373,7 +379,7 @@ types:
         description: The `pulse` was not defined in config
 
   IntegrationWeightReference:
-    integrationWeight: string
+    integration_weight: string
 
   SaveTargetReference:
     tag: string

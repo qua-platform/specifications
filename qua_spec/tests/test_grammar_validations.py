@@ -3,7 +3,7 @@ from qua_spec.grammar import load_grammar
 import os
 
 @pytest.mark.parametrize("grammar", [1,2])
-def test_all_validations_have_valid_rule(grammar):
+def test_json_validation_for_grammars(grammar):
     from jsonschema import validate
     import yaml
     import json
