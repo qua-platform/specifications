@@ -182,7 +182,9 @@ types:
     body: [AnyStatement]
     $validations:
       condition_is_boolean: 
+        rule: "false"
         description: "`condition` expression is boolean"
+        
 
   AssignmentStatement:
     lhs: AnyMemoryExpression
@@ -196,6 +198,7 @@ types:
     body: [AnyStatement]
     $validations:
       condition_is_boolean:
+        rule: "false"
         description: "`condition` expression is boolean"
 
   RusStatement:
@@ -204,6 +207,7 @@ types:
     fail: [ AnyStatement ]
     $validations:
       until_is_boolean:
+        rule: "false"
         description: "`until` expression is boolean"
 
   AlignStatement:
@@ -232,10 +236,13 @@ types:
 
     $validations:
       variable_scalar: 
+        rule: "false"
         description: "`variable` must be a scalar variable"
       values_array: 
+        rule: "false"
         description: "`values` must be an array of values"
       match_types: 
+        rule: "false"
         description: "`variable` type must match the items type of `values`"
 
   ForEachStatement:
@@ -244,6 +251,7 @@ types:
     $validations:
       # TODO: do we need this requirement?
       has_pairs: 
+        rule: "false"
         description: "`pairs` must be non-empty"
 
   WaitForTriggerStatement:
@@ -346,8 +354,10 @@ types:
     io: number
     $validations:
       integer: 
+        rule: "false"
         description: "`io` must be an integer value"
       gt0: 
+        rule: "false"
         description: "`io` must be greater than 0"
 
   LiteralFixedExpression:

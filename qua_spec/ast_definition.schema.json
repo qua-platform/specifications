@@ -70,7 +70,8 @@
                     "properties": {
                         "rule": {"type":"string"},
                         "description": {"type":"string"}
-                    }
+                    },
+                    "required": ["rule", "description"]
                 }
             },
             "additionalProperties": false

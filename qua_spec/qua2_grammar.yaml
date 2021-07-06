@@ -139,14 +139,18 @@ types:
         - size is integer
         - name is not empty
       size_gte_1:
+        rule: "false"
         description: |
           `size` must be 1 or greater
       all_values_same_type:
+        rule: "false"
         description: all `values` have the same type
       literal_value_type_match_to_type_field:
+        rule: "false"
         description: |
           `values` has the same type as `type`
       values_length_match_size:
+        rule: "false"
         description: |
           `values` length is the same size as `size`
 
@@ -166,10 +170,13 @@ types:
     values: AnyIterableExpression
     $validations:
       variable_scalar: 
+        rule: "false"
         description: "`variable` must be a scalar variable"
       values_array: 
+        rule: "false"
         description: "`values` must be an array of values"
       match_types: 
+        rule: "false"
         description: "`variable` type must match the items type of `values`"
   
   ForStatement:
@@ -177,6 +184,7 @@ types:
     body: StatementCollection
     $validations:
       size_of_iterator_is_one: 
+        rule: "false"
         description: "size of `iterator` is one"
       
   WhileStatement:
@@ -184,6 +192,7 @@ types:
     body: StatementCollection
     $validations:
       condition_is_boolean: 
+        rule: "false"
         description: "`condition` expression is boolean"
     
   IfStatement:
@@ -193,6 +202,7 @@ types:
     else_body: StatementCollection
     $validations:
       condition_is_boolean: 
+        rule: "false"
         description: "`condition` expression is boolean"
 
   ElseIfPart:
@@ -200,16 +210,19 @@ types:
     body: StatementCollection
     $validations:
       condition_is_boolean: 
+        rule: "false"
         description: "`condition` expression is boolean"
 
   BreakStatement: 
     $validations:
       break_inside_loop: 
+        rule: "false"
         description: "`break` statement is inside a loop"
       
   ContinueStatement: 
     $validations:
       break_inside_loop: 
+        rule: "false"
         description: "`continue` statement is inside a loop"
 
   SwitchStatement:
@@ -222,6 +235,7 @@ types:
     body: StatementCollection
     $validations:
       case_type_match_switch_expression_type: 
+        rule: "false"
         description: "case type match switch expression type"
       
   SequenceStatement:
@@ -315,6 +329,7 @@ types:
     index: AnyExpression
     $validations:
       integer: 
+        rule: "false"
         description: "`index` must be an integer expression"
 
   IORefExpression:
@@ -323,6 +338,7 @@ types:
       $predefined:
         - io is integer
       gt0: 
+        rule: "false"
         description: "`io` must be greater than 0"
 
   LiteralFixedExpression:
