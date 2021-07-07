@@ -60,6 +60,7 @@ unions:
     - AlignStatement
     - WaitForTriggerStatement
     - PauseStatement
+    - RepeatStatement
 
   LiteralExpression:
     - LiteralFixedExpression
@@ -179,6 +180,10 @@ types:
         rule: "false"
         description: "`variable` type must match the items type of `values`"
   
+  RepeatStatement:
+    times: AnyExpression
+    body: StatementCollection
+
   ForStatement:
     pairs: [VarIterablePair]
     body: StatementCollection
