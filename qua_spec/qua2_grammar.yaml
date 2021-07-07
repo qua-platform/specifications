@@ -139,21 +139,21 @@ types:
       $predefined:
         - size is integer
         - name is not empty
-      size_gte_1:
-        rule: "true"
-        description: |
-          `size` must be 1 or greater
-      all_values_same_type:
-        rule: "true"
-        description: all `values` have the same type
-      literal_value_type_match_to_type_field:
-        rule: "true"
-        description: |
-          `values` has the same type as `type`
-      values_length_match_size:
-        rule: "true"
-        description: |
-          `values` length is the same size as `size`
+#      size_gte_1:
+#        rule: "true"
+#        description: |
+#          `size` must be 1 or greater
+#      all_values_same_type:
+#        rule: "true"
+#        description: all `values` have the same type
+#      literal_value_type_match_to_type_field:
+#        rule: "true"
+#        description: |
+#          `values` has the same type as `type`
+#      values_length_match_size:
+#        rule: "true"
+#        description: |
+#          `values` length is the same size as `size`
 
 
   ########################## STATEMENTS
@@ -169,16 +169,16 @@ types:
   VarIterablePair:
     variable: VarRefExpression
     values: AnyIterableExpression
-    $validations:
-      variable_scalar: 
-        rule: "true"
-        description: "`variable` must be a scalar variable"
-      values_array: 
-        rule: "true"
-        description: "`values` must be an array of values"
-      match_types: 
-        rule: "true"
-        description: "`variable` type must match the items type of `values`"
+#    $validations:
+#      variable_scalar:
+#        rule: "true"
+#        description: "`variable` must be a scalar variable"
+#      values_array:
+#        rule: "true"
+#        description: "`values` must be an array of values"
+#      match_types:
+#        rule: "true"
+#        description: "`variable` type must match the items type of `values`"
   
   RepeatStatement:
     times: AnyExpression
@@ -187,48 +187,48 @@ types:
   ForStatement:
     pairs: [VarIterablePair]
     body: StatementCollection
-    $validations:
-      size_of_iterator_is_one: 
-        rule: "true"
-        description: "size of `iterator` is one"
+#    $validations:
+#      size_of_iterator_is_one:
+#        rule: "true"
+#        description: "size of `iterator` is one"
       
   WhileStatement:
     condition: AnyExpression
     body: StatementCollection
-    $validations:
-      condition_is_boolean: 
-        rule: "true"
-        description: "`condition` expression is boolean"
+#    $validations:
+#      condition_is_boolean:
+#        rule: "true"
+#        description: "`condition` expression is boolean"
     
   IfStatement:
     condition: AnyExpression
     body: StatementCollection
     else_if: [ElseIfPart]
     else_body: StatementCollection
-    $validations:
-      condition_is_boolean: 
-        rule: "true"
-        description: "`condition` expression is boolean"
+#    $validations:
+#      condition_is_boolean:
+#        rule: "true"
+#        description: "`condition` expression is boolean"
 
   ElseIfPart:
     condition: AnyExpression
     body: StatementCollection
-    $validations:
-      condition_is_boolean: 
-        rule: "true"
-        description: "`condition` expression is boolean"
+#    $validations:
+#      condition_is_boolean:
+#        rule: "true"
+#        description: "`condition` expression is boolean"
 
-  BreakStatement: 
-    $validations:
-      break_inside_loop: 
-        rule: "true"
-        description: "`break` statement is inside a loop"
+  BreakStatement: {}
+#    $validations:
+#      break_inside_loop:
+#        rule: "true"
+#        description: "`break` statement is inside a loop"
       
-  ContinueStatement: 
-    $validations:
-      break_inside_loop: 
-        rule: "true"
-        description: "`continue` statement is inside a loop"
+  ContinueStatement: {}
+#    $validations:
+#      break_inside_loop:
+#        rule: "true"
+#        description: "`continue` statement is inside a loop"
 
   SwitchStatement:
     expression: AnyExpression
@@ -238,10 +238,10 @@ types:
   CasePart:
     case: AnyExpression
     body: StatementCollection
-    $validations:
-      case_type_match_switch_expression_type: 
-        rule: "true"
-        description: "case type match switch expression type"
+#    $validations:
+#      case_type_match_switch_expression_type:
+#        rule: "true"
+#        description: "case type match switch expression type"
       
   SequenceStatement:
     body: StatementCollection
@@ -332,19 +332,19 @@ types:
   ArrayCellExpression:
     array: VarRefExpression
     index: AnyExpression
-    $validations:
-      integer: 
-        rule: "true"
-        description: "`index` must be an integer expression"
+#    $validations:
+#      integer:
+#        rule: "true"
+#        description: "`index` must be an integer expression"
 
   IORefExpression:
     io: number
     $validations:
       $predefined:
         - io is integer
-      gt0: 
-        rule: "true"
-        description: "`io` must be greater than 0"
+#      gt0:
+#        rule: "true"
+#        description: "`io` must be greater than 0"
 
   LiteralFixedExpression:
     value: number
