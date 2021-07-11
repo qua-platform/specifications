@@ -75,14 +75,16 @@ unions:
     - BinaryExpression
     - UnaryExpression
     - LibFunctionExpression
+    - ArrayRefExpression
     
   AnyTargetExpression:
     - VarRefExpression
     - ArrayCellExpression
     - IORefExpression
+    - ArrayRefExpression
     
   AnyIterableExpression:
-    - VarRefExpression
+    - ArrayRefExpression
     - RangeExpression
 
   PlayPart:
@@ -328,9 +330,12 @@ types:
 
   VarRefExpression:
     variable: string
+
+  ArrayRefExpression:
+    array: string
     
   ArrayCellExpression:
-    array: VarRefExpression
+    array: ArrayRefExpression
     index: AnyExpression
 #    $validations:
 #      integer:
