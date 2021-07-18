@@ -92,12 +92,17 @@ unions:
     - DigitalPlayPart
 
   AnyAnalogPulse:
-    - AnalogPulseReference
+    - ConstantPulse
     - RampPulse
+    - ArbitraryPulse
 
   OptionalChirp:
     - Chirp
     - NoChirp
+
+  OptionalInterpolation:
+    - Interpolation
+    - NoInterpolation
 
   OptionalAmpMultiplier:
     - AmpMultiplier
@@ -266,11 +271,23 @@ types:
     rate: AnyExpression
     time: number
 
+  ArbitraryPulse:
+    pulse: AnalogPulseReference
+    interpolation: OptionalInterpolation
+
   RampPulse:
     slope: AnyExpression
     base: AnyExpression
 
+  ConstantPulse:
+    value: AnyExpression
+
   NoOscillator: {}
+
+  Interpolation:
+    rate: AnyExpression
+
+  NoInterpolation: {}
 
   AnalogPlayPart:
     pulse: AnyAnalogPulse
@@ -300,9 +317,8 @@ types:
   
   PlayStatement:
     plays: [PlayPart]
-    duration: OptionalDuration
+    length: OptionalDuration
     condition: OptionalCondition
-    truncate: OptionalTruncate
   
   WaitStatement:
     time: AnyExpression
