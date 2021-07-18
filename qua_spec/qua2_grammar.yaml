@@ -94,7 +94,7 @@ unions:
   AnyAnalogPulse:
     - ConstantPulse
     - RampPulse
-    - ArbitraryPulse
+    - ReferencedPulse
 
   OptionalChirp:
     - Chirp
@@ -271,7 +271,7 @@ types:
     rate: AnyExpression
     time: number
 
-  ArbitraryPulse:
+  ReferencedPulse:
     pulse: AnalogPulseReference
     interpolation: OptionalInterpolation
 
