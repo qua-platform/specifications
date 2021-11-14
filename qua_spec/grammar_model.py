@@ -11,6 +11,8 @@ class PrimitiveData(Enum):
 
 
 class BaseType:
+    name: str
+
     @property
     def is_data(self):
         return False
@@ -26,12 +28,18 @@ class BaseType:
 
 @dataclass
 class EnumType(BaseType):
+    """
+    An enum type is a closed type to a specific set of named values
+    """
     name: str
     values: List[str]
 
     @property
     def is_enum(self):
         return True
+
+    def dependent_types(self, grammar):
+        return []
 
 
 @dataclass
@@ -78,7 +86,7 @@ class PredefinedValidationInfo:
 
 
 @dataclass
-class TypeValidation:
+class TypeValidationX:
     type_name: str
     name: str
     description: str
@@ -93,10 +101,38 @@ class TypeValidation:
 
 
 @dataclass
+class TypeValidation:
+    type_name: str
+    name: str
+    description: str
+    code: str
+
+
+DATA_TYPE_PLACEHOLDER = "DATA_TYPE_PLACEHOLDER"
+
+
+@dataclass
 class DataType(BaseType):
+    """
+    Data types store the most information about the AST with named properties and validations for
+    their properties
+    """
     name: str
     properties: Dict[str, TypeProperty]
     validations: List[TypeValidation]
+
+    def __post_init__(self):
+        for validation in self.validations:
+            if validation.type_name == "" or validation.type_name == DATA_TYPE_PLACEHOLDER:
+                validation.type_name = self.name
+            if validation.type_name != self.name:
+                raise Exception(
+                    f"validation {validation.name} in type {self.name} doesn't refer to the correct typename")
+            validation.description = validation.description.replace(DATA_TYPE_PLACEHOLDER, self.name)
+        for (prop_name, prop) in self.properties.items():
+            if prop.name != prop_name:
+                raise Exception(
+                    f"prop {prop_name} in type {self.name} doesn't have the right name in dictionary")
 
     @property
     def is_data(self):
@@ -111,9 +147,15 @@ class DataType(BaseType):
             collected.extend([n.name for n in union.find_datatypes(grammar)])
         return list(set(collected) - set([self.name]))
 
+    def dependent_types(self, grammar):
+        return [x.type.find_type(grammar) for x in self.properties.values() if not x.type.is_primitive]
+
 
 @dataclass
 class UnionType(BaseType):
+    """
+    A union type is an 'or' type, any of the types defined in it, can be used in it's place
+    """
     name: str
     types: List[str]
 
@@ -148,9 +190,18 @@ class UnionType(BaseType):
                 collected.extend(t.find_unions(grammar))
         return collected
 
+    def dependent_types(self, grammar):
+        return [grammar.types[typename] for typename in self.types]
+
 
 @dataclass
 class GrammarModel:
+    """
+    The grammar model describe all elements that we can describe in a grammar.
+
+    The version is just the name of the version, while the types are the type of nodes that
+    help us describe the AST (Abstract Syntax Tree) of QUA
+    """
     version: str
     types: Dict[str, Union[
         EnumType,

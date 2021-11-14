@@ -3,7 +3,6 @@ import itertools
 import yaml
 
 import qua_spec.grammar_model as model
-from qua_spec.predefined_validations import expand_predefined
 
 try:
     import importlib.resources as pkg_resources
@@ -77,22 +76,22 @@ def _load_type(name, data):
         **no_validation.__dict__,
         "validations": list(itertools.chain.from_iterable(
             [
-                [
-                    model.TypeValidation(
-                        type_name=name,
-                        name=validation_name,
-                        description=item if type(item) is str else item["description"],
-                        rule=item["rule"] if "rule" in item else None,
-                        predefined=None
-                    )
-                    for validation_name, item in data.get("$validations", {}).items() if
-                    not validation_name.startswith("$") and "rule" in item
-                ],
-                [
-                    predefined
-                    for predefined_rule in data.get("$validations", {}).get("$predefined", [])
-                    for predefined in expand_predefined(predefined_rule, no_validation)
-                ]
+                # [
+                #     # model.TypeValidation(
+                #     #     type_name=name,
+                #     #     name=validation_name,
+                #     #     description=item if type(item) is str else item["description"],
+                #     #     rule=item["rule"] if "rule" in item else None,
+                #     #     predefined=None
+                #     # )
+                #     for validation_name, item in data.get("$validations", {}).items() if
+                #     not validation_name.startswith("$") and "rule" in item
+                # ],
+                # [
+                #     predefined
+                #     for predefined_rule in data.get("$validations", {}).get("$predefined", [])
+                #     for predefined in expand_predefined(predefined_rule, no_validation)
+                # ]
             ]
         ))
     })

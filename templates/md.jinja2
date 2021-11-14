@@ -1,0 +1,57 @@
+
+grammar = GrammarModel(
+    version= "{{ grammar.version }}",
+    types= types(
+{% for type in grammar.types.values() %}
+# Data Types
+{%- if type.is_data -%}
+## {{ type.name }}
+{% for prop in type.properties.values() -%}
+TypeProperty(
+    name="{{ prop.name }}",
+    type=TypeReference(
+        type=
+        {%- if prop.type.is_primitive -%}
+            PrimitiveData.{{ prop.type.as_primitive_type_string }}
+        {%- else -%}
+            "{{ prop.type.type }}"
+        {%- endif %},
+        list={{ "True" if prop.type.list else "False" }}
+    )
+),
+{% endfor %}
+{%- endif -%}{% endfor %}
+        DataType(
+            name="{{ type.name }}",
+            properties=props(
+                {% for prop in type.properties.values() -%}
+                TypeProperty(
+                    name="{{ prop.name }}",
+                    type=TypeReference(
+                        type=
+                        {%- if prop.type.is_primitive -%}
+                            PrimitiveData.{{ prop.type.as_primitive_type_string }}
+                        {%- else -%}
+                            "{{ prop.type.type }}"
+                        {%- endif %},
+                        list={{ "True" if prop.type.list else "False" }}
+                    )
+                ),
+                {% endfor %}
+            ),
+            validations=[]
+        )
+    {%- elif type.is_enum -%}
+        EnumType(
+            name="{{ type.name }}",
+            values={% if type.values|length > 0 %}["{{ type.values|join('", "') }}"]{% else %}[]{% endif %}
+        )
+    {%- elif type.is_union -%}
+        UnionType(
+            name="{{ type.name }}",
+            types={% if type.values|length > 0 %}["{{ type.values|join('", "') }}"]{% else %}[]{% endif %}
+        )
+    {%- endif -%}
+    ,
+{% endfor %}
+))

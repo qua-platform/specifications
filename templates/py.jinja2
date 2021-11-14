@@ -1,0 +1,30 @@
+from qua_spec.flat_model import Grammar, PropertyDefinition as Prop
+
+grammar = Grammar()
+
+{% for type in grammar.types.values() %}
+grammar.
+    {%- if type.is_data -%}
+        data("{{ type.name }}", [
+        {% for prop in type.properties.values() -%}
+            Prop(name="{{ prop.name }}", type_ref={%- if prop.type.is_primitive -%}
+            {{ {'number':'"number"', 'string': '"string"', 'boolean': '"boolean"'}.get(prop.type.as_primitive_type_string) }}
+        {%- else -%}
+            "{{ prop.type.type }}"
+        {%- endif %},
+            collection={{ "True" if prop.type.list else "False" }}
+            ){{ "" if loop.last else "," }}
+        {% endfor %}
+        ])
+    {%- elif type.is_enum -%}
+        enum("{{ type.name }}", [
+        "{{ type.values|join('", "') }}"
+        ])
+    {%- elif type.is_union -%}
+        union("{{ type.name }}", [
+        {% for inner in type.find_datatypes_recursively(grammar) -%}
+            "{{ inner.name }}"{{ "" if loop.last else "," }}
+        {% endfor %}
+        ])
+    {%- endif %}
+{% endfor %}
