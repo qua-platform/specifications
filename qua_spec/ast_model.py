@@ -30,11 +30,23 @@ class AstNode:
             raise MissingTypeException(type_name=the_type)
         type_model = grammar.types[the_type]
         props = {}
+        if type_model.is_union:
+            return AstNode(
+                _type=the_type,
+                _grammar=grammar,
+                _properties={
+                    "child": AstNode._from_dict(data["data"], [*path, "data"], grammar)
+                }
+            )
         for prop in type_model.properties.values():
             if prop.name not in data:
                 raise MissingPropertyException(path, prop.name)
             if prop.type.is_primitive:
                 props[prop.name] = data[prop.name]
+            elif prop.type.list:
+                props[prop.name] = [
+                    AstNode._from_dict(d, [*path, prop.name, i], grammar) for i, d in enumerate(data[prop.name])
+                ]
             else:
                 props[prop.name] = AstNode._from_dict(data[prop.name], [*path, prop.name], grammar)
         return AstNode(

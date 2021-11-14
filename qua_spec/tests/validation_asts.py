@@ -15,15 +15,15 @@ IntegerVariableDeclaration_values_length_match_size = {
             }
         }
     },
-    "invalid2": {
-
-    }
+    # "invalid2": {
+    #
+    # }
 }
 
 IntegerVariableDeclaration_size_is_integer = {
-    "valid1": {
-    },
-    "invalid1": {
-
-    }
+    # "valid1": {
+    # },
+    # "invalid1": {
+    #
+    # }
 }

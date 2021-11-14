@@ -24,10 +24,3 @@ def apply_qua_validation(path, root_qua_dict, qua_node_dict, validations: Valida
     pass
 
 
-@dataclasses
-class AstNode:
-    def __init__(self, node, grammar) -> None:
-        super().__init__()
-        self._node = node
-
-
